@@ -5,9 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-typedef struct options {
-	int show_dot_dirs;
-} options;
+#include "helpers.h"
 
 void
 usage(const char *synopsis)
@@ -17,7 +15,7 @@ usage(const char *synopsis)
 	exit(EXIT_FAILURE);
 }
 
-void listDirectory(const char *dir_name, const options *ls_options)
+void listDirectory(const char *dir_name, const Options *ls_options)
 {
 	DIR *dp;
 	struct dirent *dir_entry;
@@ -32,6 +30,7 @@ void listDirectory(const char *dir_name, const options *ls_options)
 			printf("%s\n", dir_entry->d_name);
 		}
 	}
+	(void)closedir(dp);
 }
 
 int
@@ -41,7 +40,7 @@ main(int argc, char *argv[])
 	const char *all_opts = "a";
 	const char *synopsis = "a";
 	const char *cwd_name = ".";
-	options prog_options;
+	Options prog_options;
 
 	setprogname(argv[0]);
 
