@@ -7,6 +7,8 @@
 
 #include "helpers.h"
 
+/* FIXME: swap to using fts for directory traversal */
+
 void
 usage(const char *synopsis)
 {
@@ -43,6 +45,8 @@ main(int argc, char *argv[])
 	Options prog_options;
 
 	setprogname(argv[0]);
+
+	setDefaultOptions(&prog_options);
 
 	while ((ch = getopt(argc, argv, all_opts)) != -1) {
 		switch (ch) {

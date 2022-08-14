@@ -5,6 +5,8 @@
 
 typedef struct Options {
 	int show_dot_dirs;
+	int sort_by_name;
+	int do_not_sort;
 } Options;
 
 typedef struct PathNode {
@@ -15,7 +17,10 @@ typedef struct PathNode {
 
 typedef struct PathList {
 	struct PathNode *head;
+	size_t size;
 } PathList;
+
+void setDefaultOptions(Options *opts);
 
 PathList *newPathList();
 int addPath(PathList *plist, const char *path);
