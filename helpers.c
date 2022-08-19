@@ -67,8 +67,8 @@ addPath(PathList *plist, const char *path)
 		    strerror(errno));
 
 		/* this isn't a fatal error, cleanup and move on */
-		free(name);
-		free(sb);
+		(void)free(name);
+		(void)free(sb);
 		return STAT_ERROR;
 	}
 
@@ -139,8 +139,8 @@ sortPaths(PathList *plist, const Options *ls_options)
 	internal_list = plist;
 	plist = temp_list;
 
-	free(internal_list);
-	free(parray);
+	(void)free(internal_list);
+	(void)free(parray);
 }
 
 void 
@@ -155,16 +155,16 @@ freePathList(PathList *plist)
 		curr = curr->next;
 
 		if (temp->path_name != NULL) {
-			free(temp->path_name);
+			(void)free(temp->path_name);
 		}
 
 		if (temp->path_stat != NULL) {
-			free(temp->path_stat);
+			(void)free(temp->path_stat);
 		}
 
-		free(temp);
+		(void)free(temp);
 	}
 
-	free(plist);
+	(void)free(plist);
 	plist = NULL;
 }
