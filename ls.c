@@ -21,6 +21,9 @@ void listDirectory(const char *dir_name, const Options *ls_options)
 {
 	DIR *dp;
 	struct dirent *dir_entry;
+	PathList *plist = newPathList();
+	PathNode *curr = NULL;
+
 	if ((dp = opendir(dir_name)) == NULL) {
 		fprintf(stderr, "Could not open directory %s: %s\n",
 		    dir_name, strerror(errno));
@@ -29,10 +32,20 @@ void listDirectory(const char *dir_name, const Options *ls_options)
 	while ((dir_entry = readdir(dp)) != NULL) {
 		if (dir_entry->d_name[0] != '.' || 
 		    ls_options->show_dot_dirs) {
-			printf("%s\n", dir_entry->d_name);
+		    	addPath(plist, dir_entry->d_name);
+			/*printf("%s\n", dir_entry->d_name);*/
 		}
 	}
+
+	sortPaths(plist, ls_options);
+	curr = plist->head;
+	while (curr != NULL) {
+		printf("%s\n", curr->path_name);
+		curr = curr->next;
+	}
+
 	(void)closedir(dp);
+	freePathList(plist);
 }
 
 int

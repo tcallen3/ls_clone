@@ -10,8 +10,6 @@
 static int STAT_ERROR = 1;
 static int NODE_SUCCESS = 0;
 
-/* FIXME: need to define sortin fuctions, e.g. nameComp() */
-
 void 
 setDefaultOptions(Options *opts)
 {
@@ -39,7 +37,6 @@ int
 addPath(PathList *plist, const char *path)
 {
 	size_t len = 0;
-	char *name = NULL;
 	struct stat *sb = NULL;
 	PathNode *node = NULL;
 
@@ -48,13 +45,19 @@ addPath(PathList *plist, const char *path)
 	   must pass pointer-to-pointer for name, since we need to
 	   assign the pointer itself by reference - see man reallocarr 
 	*/
-	if (reallocarr(&name, len, sizeof(*name)) != 0) {
+	if ((node = malloc(sizeof(*node))) == NULL) {
+		fprintf(stderr, "Could not allocate memory for node: %s\n",
+		    strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	if (reallocarr(&node->path_name, len, sizeof(*node->path_name)) != 0) {
 		fprintf(stderr, "Could not allocate memory for path: %s\n",
 		    strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	strncpy(name, path, len);
+	strncpy(node->path_name, path, len);
 
 	if ((sb = malloc(sizeof(*sb))) == NULL) {
 		fprintf(stderr, "Could not allocate memory for stat: %s\n",
@@ -62,30 +65,34 @@ addPath(PathList *plist, const char *path)
 		exit(EXIT_FAILURE);
 	}
 
-	if (lstat(name, sb) == -1) {
-		fprintf(stderr, "Cannot stat %s: %s\n", name, 
+	if (lstat(node->path_name, sb) == -1) {
+		fprintf(stderr, "Cannot stat %s: %s\n", node->path_name, 
 		    strerror(errno));
 
 		/* this isn't a fatal error, cleanup and move on */
-		(void)free(name);
+		(void)free(node->path_name);
+		node->path_name = NULL;
 		(void)free(sb);
+
 		return STAT_ERROR;
 	}
 
-	if ((node = malloc(*node)) == NULL) {
-		fprintf(stderr, "Could not allocate memory for node: %s\n",
-		    strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
 	node->next = plist->head;
-	node->path_name = name;
 	node->path_stat = sb;
 
 	plist->head = node;
 	plist->size++;
 
 	return NODE_SUCCESS;
+}
+
+int 
+nameComp(const void *a, const void *b)
+{
+	PathNode *first = *(PathNode **)a;
+	PathNode *second = *(PathNode **)b;
+
+	return strcmp(first->path_name, second->path_name);
 }
 
 /*
@@ -97,18 +104,19 @@ addPath(PathList *plist, const char *path)
 void 
 sortPaths(PathList *plist, const Options *ls_options)
 {
+	PathList internal_list;
+
 	size_t index = 0;
 	size_t derived = 0;
+	size_t plsize = plist->size;
 	PathNode *curr_node = NULL;
 	PathNode **parray = NULL;
-	PathList *internal_list = NULL;
-	PathList *temp_list = NULL;
 
-	if (ls_options->do_not_sort || plist->size == 0) {
+	if (ls_options->do_not_sort || plsize == 0) {
 		return;
 	}
 
-	if (reallocarr(&parray, plist->size, sizeof(*parray)) != 0) {
+	if (reallocarr(&parray, plsize, sizeof(*parray)) != 0) {
 		fprintf(stderr, "Could not allocate sorting array: %s\n",
 		    strerror(errno));
 		exit(EXIT_FAILURE);
@@ -122,25 +130,24 @@ sortPaths(PathList *plist, const Options *ls_options)
 	}
 	
 	/* for now, just sorting by name */
-	qsort(parray, plist->size, sizeof(*parray), nameComp);
+	qsort(parray, plsize, sizeof(*parray), nameComp);
 
-	internal_list = newPathList();
-	internal_list->size = plist->size;
+	internal_list.head = NULL;
+	internal_list.size = plsize;
 
 	/* insert from head in reverse on new list */
-	for (index = 0; index < plist->size; index++) {
-		derived = (plist->size - 1) - index;
-		parray[derived]->next = internal_list->head;
-		internal_list->head = parray[derived];
+	for (index = 0; index < plsize; index++) {
+		derived = (plsize - 1) - index;
+		parray[derived]->next = internal_list.head;
+		internal_list.head = parray[derived];
 	}
 
 	/* swap pointers */
-	temp_list = internal_list;
-	internal_list = plist;
-	plist = temp_list;
+	plist->head = internal_list.head;
+	plist->size = internal_list.size;
 
-	(void)free(internal_list);
 	(void)free(parray);
+	parray = NULL;
 }
 
 void 
@@ -156,13 +163,16 @@ freePathList(PathList *plist)
 
 		if (temp->path_name != NULL) {
 			(void)free(temp->path_name);
+			temp->path_name = NULL;
 		}
 
 		if (temp->path_stat != NULL) {
 			(void)free(temp->path_stat);
+			temp->path_stat = NULL;
 		}
 
 		(void)free(temp);
+		temp = NULL;
 	}
 
 	(void)free(plist);

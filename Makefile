@@ -3,7 +3,7 @@ CFLAGS += -Wlogical-op -Wpedantic -Wshadow
 
 PROG = my_ls
 
-SRC = ls.c
+SRC = ls.c helpers.c
 BIN = bin
 
 all: $(PROG)

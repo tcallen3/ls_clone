@@ -11,7 +11,7 @@ typedef struct Options {
 
 typedef struct PathNode {
 	struct PathNode *next;
-	const char *path_name;
+	char *path_name;
 	struct stat *path_stat;
 } PathNode;
 
