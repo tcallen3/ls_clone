@@ -4,8 +4,13 @@
 #include <sys/stat.h>
 
 typedef struct Options {
+	int hide_self_parent;
 	int show_dot_dirs;
 	int sort_by_name;
+	int sort_by_size;
+	int sort_by_ctime;
+	int sort_by_mtime;
+	int sort_by_atime;
 	int do_not_sort;
 } Options;
 

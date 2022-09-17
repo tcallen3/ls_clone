@@ -30,10 +30,20 @@ void listDirectory(const char *dir_name, const Options *ls_options)
 		exit(EXIT_FAILURE);
 	}
 	while ((dir_entry = readdir(dp)) != NULL) {
-		if (dir_entry->d_name[0] != '.' || 
-		    ls_options->show_dot_dirs) {
-		    	addPath(plist, dir_entry->d_name);
-			/*printf("%s\n", dir_entry->d_name);*/
+		if (dir_entry->d_name[0] != '.' ) {
+			(void)addPath(plist, dir_entry->d_name);
+		} else if (ls_options->show_dot_dirs) {
+			if (strcmp(dir_entry->d_name, ".") == 0 && 
+			    ls_options->hide_self_parent) {
+				continue;
+			}
+			if (strcmp(dir_entry->d_name, "..") == 0 &&
+			    ls_options->hide_self_parent) {
+				continue;
+			}
+
+			/* some other path starting with '.' */
+			(void)addPath(plist, dir_entry->d_name);
 		}
 	}
 
@@ -52,8 +62,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "a";
-	const char *synopsis = "a";
+	const char *all_opts = "AacfStu";
 	const char *cwd_name = ".";
 	Options prog_options;
 
@@ -61,15 +70,42 @@ main(int argc, char *argv[])
 
 	setDefaultOptions(&prog_options);
 
+/* FIXME: sorting by time should require -t and only c or u modify it */
 	while ((ch = getopt(argc, argv, all_opts)) != -1) {
 		switch (ch) {
-		case 'a':
-			printf("Option 'a' selected\n");
+		case 'A':
 			prog_options.show_dot_dirs = 1;
+			prog_options.hide_self_parent = 1;
+			break;
+		case 'a':
+			prog_options.show_dot_dirs = 1;
+			break;
+		case 'c':
+			prog_options.sort_by_atime = 0;
+			prog_options.sort_by_mtime = 0;
+			prog_options.sort_by_ctime = 1;
+			break;
+		case 'f':
+			/* as in NetBSD, we take -f to imply -a */
+			prog_options.show_dot_dirs = 1;
+			prog_options.do_not_sort = 1;
+			break;
+		case 'S':
+			prog_options.sort_by_size = 1;
+			break;
+		case 't':
+			prog_options.sort_by_atime = 0;
+			prog_options.sort_by_mtime = 1;
+			prog_options.sort_by_ctime = 0;
+			break;
+		case 'u':
+			prog_options.sort_by_atime = 1;
+			prog_options.sort_by_mtime = 0;
+			prog_options.sort_by_ctime = 0;
 			break;
 		case '?':
 		default:
-			usage(synopsis);
+			usage(all_opts);
 			/* NOTREACHED */
 		}
 	}
@@ -83,6 +119,7 @@ main(int argc, char *argv[])
 	}
 
 	while (argc > 0) {
+	/* FIXME: implement */
 		printf("File argument: %s\n", argv[0]);
 		argc--;
 		argv++;

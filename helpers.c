@@ -13,9 +13,14 @@ static int NODE_SUCCESS = 0;
 void 
 setDefaultOptions(Options *opts)
 {
+	opts->hide_self_parent = 0;
 	opts->do_not_sort = 0;
 	opts->show_dot_dirs = 0;
 	opts->sort_by_name = 1;
+	opts->sort_by_size = 0;
+	opts->sort_by_ctime = 0;
+	opts->sort_by_mtime = 0;
+	opts->sort_by_atime = 0;
 }
 
 PathList *
@@ -95,6 +100,86 @@ nameComp(const void *a, const void *b)
 	return strcmp(first->path_name, second->path_name);
 }
 
+int
+sizeComp(const void *a, const void *b)
+{
+	off_t s1, s2;
+	PathNode *first = *(PathNode **)a;
+	PathNode *second = *(PathNode **)b;
+
+	s1 = first->path_stat->st_size;
+	s2 = second->path_stat->st_size;
+
+	/* we want largest file to sort first, so we reverse a < b logic */
+	if (s1 < s2) {
+		return 1;
+	} else if (s1 > s2) {
+		return -1;
+	}
+
+	return 0;
+}
+
+int
+ctimeComp(const void *a, const void *b)
+{
+	time_t t1, t2;
+	PathNode *first = *(PathNode **)a;
+	PathNode *second = *(PathNode **)b;
+
+	t1 = first->path_stat->st_ctime;
+	t2 = second->path_stat->st_ctime;
+
+	/* we want most recent to sort first, so we reverse a < b logic */
+	if (t1 < t2) {
+		return 1;
+	} else if (t1 > t2) {
+		return -1;
+	}
+
+	return 0;
+}
+
+int
+mtimeComp(const void *a, const void *b)
+{
+	time_t t1, t2;
+	PathNode *first = *(PathNode **)a;
+	PathNode *second = *(PathNode **)b;
+
+	t1 = first->path_stat->st_mtime;
+	t2 = second->path_stat->st_mtime;
+
+	/* we want most recent to sort first, so we reverse a < b logic */
+	if (t1 < t2) {
+		return 1;
+	} else if (t1 > t2) {
+		return -1;
+	}
+
+	return 0;
+}
+
+int
+atimeComp(const void *a, const void *b)
+{
+	time_t t1, t2;
+	PathNode *first = *(PathNode **)a;
+	PathNode *second = *(PathNode **)b;
+
+	t1 = first->path_stat->st_atime;
+	t2 = second->path_stat->st_atime;
+
+	/* we want most recent to sort first, so we reverse a < b logic */
+	if (t1 < t2) {
+		return 1;
+	} else if (t1 > t2) {
+		return -1;
+	}
+
+	return 0;
+}
+
 /*
  * We sort the list by creating an array of pointers to entries
  * then indirecting through the array so we can use qsort. After,
@@ -105,6 +190,7 @@ void
 sortPaths(PathList *plist, const Options *ls_options)
 {
 	PathList internal_list;
+	int (*fcomp)(const void *, const void *);
 
 	size_t index = 0;
 	size_t derived = 0;
@@ -129,8 +215,18 @@ sortPaths(PathList *plist, const Options *ls_options)
 		curr_node = curr_node->next;
 	}
 	
-	/* for now, just sorting by name */
-	qsort(parray, plsize, sizeof(*parray), nameComp);
+	fcomp = nameComp;
+	if (ls_options->sort_by_size) {
+		fcomp = sizeComp;
+	} else if (ls_options->sort_by_ctime) {
+		fcomp = ctimeComp;
+	} else if (ls_options->sort_by_mtime) {
+		fcomp = mtimeComp;
+	} else if (ls_options->sort_by_atime) {
+		fcomp = atimeComp;
+	}
+
+	qsort(parray, plsize, sizeof(*parray), fcomp);
 
 	internal_list.head = NULL;
 	internal_list.size = plsize;
