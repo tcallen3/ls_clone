@@ -5,9 +5,10 @@
 
 typedef struct Options {
 	int hide_self_parent;
+	int list_dir_recursive;
 	int show_dot_dirs;
-	int sort_by_name;
 	int sort_by_size;
+	int sort_time;
 	int sort_by_ctime;
 	int sort_by_mtime;
 	int sort_by_atime;
@@ -25,11 +26,8 @@ typedef struct PathList {
 	size_t size;
 } PathList;
 
-void setDefaultOptions(Options *opts);
-
-PathList *newPathList();
-int addPath(PathList *plist, const char *path);
-void sortPaths(PathList *plist, const Options *ls_options);
-void freePathList(PathList *plist);
+void setDefaultOptions(Options *);
+void traverseShallow(char **, const Options *);
+void traverseRecursive(char **, const Options *);
 
 #endif /* LS_HELPERS */

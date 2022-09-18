@@ -17,45 +17,14 @@ usage(const char *synopsis)
 	exit(EXIT_FAILURE);
 }
 
-void listDirectory(const char *dir_name, const Options *ls_options)
+void 
+listDirectory(char **inputs, const Options *ls_options)
 {
-	DIR *dp;
-	struct dirent *dir_entry;
-	PathList *plist = newPathList();
-	PathNode *curr = NULL;
-
-	if ((dp = opendir(dir_name)) == NULL) {
-		fprintf(stderr, "Could not open directory %s: %s\n",
-		    dir_name, strerror(errno));
-		exit(EXIT_FAILURE);
+	if (ls_options->list_dir_recursive) {
+		traverseRecursive(inputs, ls_options);
+	} else {
+		traverseShallow(inputs, ls_options);
 	}
-	while ((dir_entry = readdir(dp)) != NULL) {
-		if (dir_entry->d_name[0] != '.' ) {
-			(void)addPath(plist, dir_entry->d_name);
-		} else if (ls_options->show_dot_dirs) {
-			if (strcmp(dir_entry->d_name, ".") == 0 && 
-			    ls_options->hide_self_parent) {
-				continue;
-			}
-			if (strcmp(dir_entry->d_name, "..") == 0 &&
-			    ls_options->hide_self_parent) {
-				continue;
-			}
-
-			/* some other path starting with '.' */
-			(void)addPath(plist, dir_entry->d_name);
-		}
-	}
-
-	sortPaths(plist, ls_options);
-	curr = plist->head;
-	while (curr != NULL) {
-		printf("%s\n", curr->path_name);
-		curr = curr->next;
-	}
-
-	(void)closedir(dp);
-	freePathList(plist);
 }
 
 int
@@ -63,7 +32,8 @@ main(int argc, char *argv[])
 {
 	int ch;
 	const char *all_opts = "AacfStu";
-	const char *cwd_name = ".";
+	char *local_default[2] = {".", NULL};
+	char **file_targets = NULL;
 	Options prog_options;
 
 	setprogname(argv[0]);
@@ -94,6 +64,7 @@ main(int argc, char *argv[])
 			prog_options.sort_by_size = 1;
 			break;
 		case 't':
+			prog_options.sort_time = 1;
 			prog_options.sort_by_atime = 0;
 			prog_options.sort_by_mtime = 1;
 			prog_options.sort_by_ctime = 0;
@@ -112,18 +83,14 @@ main(int argc, char *argv[])
 	
 	argc -= optind;
 	argv += optind;
-
+	
+	file_targets = argv;
 	if (argc == 0) {
 		/* if no files are specified, list contents of CWD */
-		listDirectory(cwd_name, &prog_options);
+		file_targets = local_default;
 	}
 
-	while (argc > 0) {
-	/* FIXME: implement */
-		printf("File argument: %s\n", argv[0]);
-		argc--;
-		argv++;
-	}
+	listDirectory(file_targets, &prog_options);
 
 	return EXIT_SUCCESS;
 }
