@@ -118,10 +118,14 @@ chooseSort(const Options *ls_options)
 	return cptr;
 }
 
+/* 
+FIXME: difference to ls when using e.g. ls . .. in how dir names
+are printed.
+*/
 static int
 showEntry(FTSENT *fts_ent, const Options *ls_options)
 {
-	/* FIXME: don't show implicit '.' dir at root */
+	/* don't show implicit '.' at file hierarchy root */
 	if (fts_ent->fts_info == FTS_D 	&& 
 	    fts_ent->fts_level == 0   	&&
 	    !ls_options->show_dir_header) {
@@ -160,7 +164,8 @@ traverseShallow(char **inputs, const Options *ls_options)
 		if (showEntry(fts_ent, ls_options)) {
 			printf("%s", fts_ent->fts_name);
 
-			if (fts_ent->fts_level == 0) {
+			if (fts_ent->fts_info == FTS_D && 
+			    fts_ent->fts_level == 0) {
 				printf(":");
 			}
 
