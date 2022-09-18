@@ -27,6 +27,20 @@ listDirectory(char **inputs, const Options *ls_options)
 	}
 }
 
+void
+normalizeDirNames(const int argc, char **argv)
+{
+	int i = 0;
+	size_t len = 0;
+
+	for (i = 0; i < argc; i++) {
+		len = strlen(argv[i]);
+		if (argv[i][len-1] == '/') {
+			argv[i][len-1] = '\0';
+		}
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -44,11 +58,11 @@ main(int argc, char *argv[])
 	while ((ch = getopt(argc, argv, all_opts)) != -1) {
 		switch (ch) {
 		case 'A':
-			prog_options.show_dot_dirs = 1;
-			prog_options.hide_self_parent = 1;
+			prog_options.show_hidden = 1;
 			break;
 		case 'a':
-			prog_options.show_dot_dirs = 1;
+			prog_options.show_self_parent = 1;
+			prog_options.show_hidden = 1;
 			break;
 		case 'c':
 			prog_options.sort_by_atime = 0;
@@ -57,7 +71,7 @@ main(int argc, char *argv[])
 			break;
 		case 'f':
 			/* as in NetBSD, we take -f to imply -a */
-			prog_options.show_dot_dirs = 1;
+			prog_options.show_hidden = 1;
 			prog_options.do_not_sort = 1;
 			break;
 		case 'S':
@@ -83,6 +97,12 @@ main(int argc, char *argv[])
 	
 	argc -= optind;
 	argv += optind;
+
+	if (argc > 1) {
+		prog_options.show_dir_header = 1;
+	}
+
+	normalizeDirNames(argc, argv);
 	
 	file_targets = argv;
 	if (argc == 0) {

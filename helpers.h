@@ -4,9 +4,10 @@
 #include <sys/stat.h>
 
 typedef struct Options {
-	int hide_self_parent;
+	int show_self_parent;
 	int list_dir_recursive;
-	int show_dot_dirs;
+	int show_hidden;
+	int show_dir_header;
 	int sort_by_size;
 	int sort_time;
 	int sort_by_ctime;

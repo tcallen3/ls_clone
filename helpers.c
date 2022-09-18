@@ -14,10 +14,11 @@ typedef int (*CompPointer)(const FTSENT **, const FTSENT**);
 void 
 setDefaultOptions(Options *opts)
 {
-	opts->hide_self_parent = 0;
+	opts->show_self_parent = 0;
 	opts->list_dir_recursive = 0;
 	opts->do_not_sort = 0;
-	opts->show_dot_dirs = 0;
+	opts->show_hidden = 0;
+	opts->show_dir_header = 0;
 	opts->sort_by_size = 0;
 	opts->sort_time = 0;
 	opts->sort_by_ctime = 0;
@@ -117,19 +118,53 @@ chooseSort(const Options *ls_options)
 	return cptr;
 }
 
+static int
+showEntry(FTSENT *fts_ent, const Options *ls_options)
+{
+	/* FIXME: don't show implicit '.' dir at root */
+	if (fts_ent->fts_info == FTS_D 	&& 
+	    fts_ent->fts_level == 0   	&&
+	    !ls_options->show_dir_header) {
+		return 0;
+	}
+
+	/* don't show directories a second time */
+	if (fts_ent->fts_info == FTS_DP) {
+		return 0;
+	}
+
+	if (fts_ent->fts_name[0] == '.' && !ls_options->show_hidden) {
+		return 0;
+	}
+	
+	/* default to showing */
+	return 1;
+}
+
 void
 traverseShallow(char **inputs, const Options *ls_options)
 {
 	FTS *fts_hier = NULL;
 	FTSENT *fts_ent = NULL;
 	CompPointer fcomp = NULL;
+	int fts_options = FTS_LOGICAL;
+
+	if (ls_options->show_self_parent) {
+		fts_options |= FTS_SEEDOT;
+	}
 
 	fcomp = chooseSort(ls_options);	
 	
-	fts_hier = fts_open(inputs, FTS_LOGICAL, fcomp);
+	fts_hier = fts_open(inputs, fts_options, fcomp);
 	while ((fts_ent = fts_read(fts_hier)) != NULL) {
-		if (fts_ent->fts_info != FTS_DP) {
-			printf("%s\n", fts_ent->fts_name);
+		if (showEntry(fts_ent, ls_options)) {
+			printf("%s", fts_ent->fts_name);
+
+			if (fts_ent->fts_level == 0) {
+				printf(":");
+			}
+
+			printf("\n");
 		}
 
 		if (fts_ent->fts_info == FTS_D && fts_ent->fts_level != 0) {
