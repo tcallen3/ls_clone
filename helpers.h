@@ -27,6 +27,7 @@ typedef struct PathList {
 	size_t size;
 } PathList;
 
+void setReverseSort();
 void setDefaultOptions(Options *);
 void traverseShallow(char **, const Options *);
 void traverseRecursive(char **, const Options *);

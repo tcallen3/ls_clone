@@ -45,7 +45,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacfStu";
+	const char *all_opts = "AacfrStu";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -73,6 +73,9 @@ main(int argc, char *argv[])
 			/* as in NetBSD, we take -f to imply -a */
 			prog_options.show_hidden = 1;
 			prog_options.do_not_sort = 1;
+			break;
+		case 'r':
+			setReverseSort();
 			break;
 		case 'S':
 			prog_options.sort_by_size = 1;

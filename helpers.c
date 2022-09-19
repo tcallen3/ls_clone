@@ -9,7 +9,15 @@
 
 #include "helpers.h"
 
+static int scaling = 1;
+
 typedef int (*CompPointer)(const FTSENT **, const FTSENT**);
+
+void 
+setReverseSort()
+{
+	scaling = -1;
+}
 
 void 
 setDefaultOptions(Options *opts)
@@ -29,7 +37,7 @@ setDefaultOptions(Options *opts)
 static int 
 nameComp(const FTSENT **first, const FTSENT **second)
 {
-	return strcmp((*first)->fts_name, (*second)->fts_name);
+	return scaling * strcmp((*first)->fts_name, (*second)->fts_name);
 }
 
 static int
@@ -40,9 +48,9 @@ sizeComp(const FTSENT **first, const FTSENT **second)
 
 	/* we want largest file to sort first, so we reverse a < b logic */
 	if (s1 < s2) {
-		return 1;
+		return 1 * scaling;
 	} else if (s1 > s2) {
-		return -1;
+		return -1 * scaling;
 	}
 
 	return 0;
@@ -56,9 +64,9 @@ ctimeComp(const FTSENT **first, const FTSENT **second)
 
 	/* we want most recent to sort first, so we reverse a < b logic */
 	if (t1 < t2) {
-		return 1;
+		return 1 * scaling;
 	} else if (t1 > t2) {
-		return -1;
+		return -1 * scaling;
 	}
 
 	return 0;
@@ -72,9 +80,9 @@ mtimeComp(const FTSENT **first, const FTSENT **second)
 
 	/* we want most recent to sort first, so we reverse a < b logic */
 	if (t1 < t2) {
-		return 1;
+		return 1 * scaling;
 	} else if (t1 > t2) {
-		return -1;
+		return -1 * scaling;
 	}
 
 	return 0;
@@ -88,9 +96,9 @@ atimeComp(const FTSENT **first, const FTSENT **second)
 
 	/* we want most recent to sort first, so we reverse a < b logic */
 	if (t1 < t2) {
-		return 1;
+		return 1 * scaling;
 	} else if (t1 > t2) {
-		return -1;
+		return -1 * scaling;
 	}
 
 	return 0;
