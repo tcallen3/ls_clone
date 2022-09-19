@@ -7,8 +7,6 @@
 
 #include "helpers.h"
 
-/* FIXME: swap to using fts for directory traversal */
-
 void
 usage(const char *synopsis)
 {
@@ -54,7 +52,6 @@ main(int argc, char *argv[])
 
 	setDefaultOptions(&prog_options);
 
-/* FIXME: sorting by time should require -t and only c or u modify it */
 	while ((ch = getopt(argc, argv, all_opts)) != -1) {
 		switch (ch) {
 		case 'A':
