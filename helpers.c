@@ -126,13 +126,11 @@ chooseSort(const Options *ls_options)
 	return cptr;
 }
 
-/* 
-FIXME: difference to ls when using e.g. ls . .. in how dir names
-are printed.
-*/
 static int
 showEntry(FTSENT *fts_ent, const Options *ls_options)
 {
+	int dot_exceptions = 0;
+
 	/* don't show implicit '.' at file hierarchy root */
 	if (fts_ent->fts_info == FTS_D 	&& 
 	    fts_ent->fts_level == 0   	&&
@@ -145,7 +143,9 @@ showEntry(FTSENT *fts_ent, const Options *ls_options)
 		return 0;
 	}
 
-	if (fts_ent->fts_name[0] == '.' && !ls_options->show_hidden) {
+	dot_exceptions = ls_options->show_hidden || 
+			 ls_options->show_dir_header;
+	if (fts_ent->fts_name[0] == '.' && !dot_exceptions) {
 		return 0;
 	}
 	
