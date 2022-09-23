@@ -1,5 +1,5 @@
-#ifndef LS_HELPERS
-#define LS_HELPERS
+#ifndef LS_HELPERS_H
+#define LS_HELPERS_H
 
 #include <sys/stat.h>
 
@@ -33,4 +33,4 @@ void setDefaultOptions(Options *);
 void traverseShallow(char **, const Options *);
 void traverseRecursive(char **, const Options *);
 
-#endif /* LS_HELPERS */
+#endif /* LS_HELPERS_H */

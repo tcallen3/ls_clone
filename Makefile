@@ -3,14 +3,17 @@ CFLAGS += -Wlogical-op -Wpedantic -Wshadow
 
 PROG = my_ls
 
-SRC = ls.c helpers.c
+SRC = ls.c helpers.c print.c
 BIN = bin
 
-all: $(PROG)
+all: ${PROG}
 
-$(PROG): $(SRC)
-	mkdir -p $(BIN)
-	$(CC) $(CFLAGS) -o $(BIN)/$(PROG) $(SRC)
+depend:
+	mkdep -- ${CFLAGS} *.c
+
+${PROG}: ${SRC}
+	mkdir -p ${BIN}
+	${CC} ${CFLAGS} -o ${BIN}/${PROG} ${SRC}
 
 clean:
-	rm -rf $(PROG)
+	rm -rf ${PROG}

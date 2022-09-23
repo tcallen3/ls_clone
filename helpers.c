@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "helpers.h"
+#include "print.h"
 
 static int scaling = 1;
 
@@ -173,15 +174,7 @@ traverseShallow(char **inputs, const Options *ls_options)
 	fts_hier = fts_open(inputs, fts_options, fcomp);
 	while ((fts_ent = fts_read(fts_hier)) != NULL) {
 		if (showEntry(fts_ent, ls_options)) {
-			printf("%s", fts_ent->fts_name);
-
-			if (fts_ent->fts_info == FTS_D && 
-			    fts_ent->fts_level == 0    &&
-			    !ls_options->plain_dirs) {
-				printf(":");
-			}
-
-			printf("\n");
+			printEntry(fts_ent, ls_options);
 		}
 
 		fts_term = (fts_ent->fts_level != 0) || 
