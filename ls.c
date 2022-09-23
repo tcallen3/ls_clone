@@ -43,7 +43,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacfrStu";
+	const char *all_opts = "AacdfrStu";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -65,6 +65,11 @@ main(int argc, char *argv[])
 			prog_options.sort_by_atime = 0;
 			prog_options.sort_by_mtime = 0;
 			prog_options.sort_by_ctime = 1;
+			break;
+		case 'd':
+			prog_options.plain_dirs = 1;
+			/* is this hackish? */
+			prog_options.show_dir_header = 1;
 			break;
 		case 'f':
 			/* as in NetBSD, we take -f to imply -a */

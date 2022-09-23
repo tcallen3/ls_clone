@@ -24,6 +24,7 @@ setDefaultOptions(Options *opts)
 {
 	opts->show_self_parent = 0;
 	opts->list_dir_recursive = 0;
+	opts->plain_dirs = 0;
 	opts->do_not_sort = 0;
 	opts->show_hidden = 0;
 	opts->show_dir_header = 0;
@@ -159,7 +160,9 @@ traverseShallow(char **inputs, const Options *ls_options)
 	FTS *fts_hier = NULL;
 	FTSENT *fts_ent = NULL;
 	CompPointer fcomp = NULL;
-	int fts_options = FTS_LOGICAL;
+	int fts_options = ls_options->plain_dirs ? 
+				FTS_PHYSICAL : FTS_LOGICAL;
+	int fts_term = 0;
 
 	if (ls_options->show_self_parent) {
 		fts_options |= FTS_SEEDOT;
@@ -173,14 +176,18 @@ traverseShallow(char **inputs, const Options *ls_options)
 			printf("%s", fts_ent->fts_name);
 
 			if (fts_ent->fts_info == FTS_D && 
-			    fts_ent->fts_level == 0) {
+			    fts_ent->fts_level == 0    &&
+			    !ls_options->plain_dirs) {
 				printf(":");
 			}
 
 			printf("\n");
 		}
 
-		if (fts_ent->fts_info == FTS_D && fts_ent->fts_level != 0) {
+		fts_term = (fts_ent->fts_level != 0) || 
+			   (ls_options->plain_dirs); 
+
+		if (fts_ent->fts_info == FTS_D && fts_term) {
 			if (fts_set(fts_hier, fts_ent, FTS_SKIP) != 0) {
 				perror("fts_set() entry");
 				exit(EXIT_FAILURE);
@@ -201,6 +208,6 @@ traverseRecursive(char **inputs, const Options *ls_options)
 {
 	(void)inputs;
 	(void)ls_options;
-	/* FIXME: implement */
+	/* FIXME: implement (also consider how to support R and d both? */
 	return;
 }
