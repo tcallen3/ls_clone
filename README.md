@@ -4,7 +4,7 @@
 
 # SYNOPSIS
 
-ls [-AacdFfhiklnqRrSstuw] [*file...*]
+`ls [-AacdFfhiklnqRrSstuw] [file...]`
 
 # DESCRIPTION
 
@@ -17,7 +17,7 @@ of options supported.
 One noticeable difference versus system `ls` is that this implementation 
 always separates output entries using newlines, to avoid some complexity
 in format wrangling. Less immediately obvious, but more significantly,
-this version does not support text locales or other cross-language
+this version does not support text locales or other cross-region
 portability features, so it is limited to US-ASCII systems.
 
 # NOTES
