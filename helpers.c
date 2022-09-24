@@ -55,7 +55,8 @@ sizeComp(const FTSENT **first, const FTSENT **second)
 		return -1 * scaling;
 	}
 
-	return 0;
+	/* sizes equal, sort lexicographically */
+	return nameComp(first, second);
 }
 
 static int
@@ -71,7 +72,8 @@ ctimeComp(const FTSENT **first, const FTSENT **second)
 		return -1 * scaling;
 	}
 
-	return 0;
+	/* times equal, so sort lexicographically */
+	return nameComp(first, second);
 }
 
 static int
@@ -87,7 +89,8 @@ mtimeComp(const FTSENT **first, const FTSENT **second)
 		return -1 * scaling;
 	}
 
-	return 0;
+	/* times equal, so sort lexicographically */
+	return nameComp(first, second);
 }
 
 static int
@@ -103,7 +106,8 @@ atimeComp(const FTSENT **first, const FTSENT **second)
 		return -1 * scaling;
 	}
 
-	return 0;
+	/* times equal, so sort lexicographically */
+	return nameComp(first, second);
 }
 
 CompPointer
