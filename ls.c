@@ -43,7 +43,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacdfirSstu";
+	const char *all_opts = "AacdfhikrSstu";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -76,8 +76,16 @@ main(int argc, char *argv[])
 			prog_options.show_hidden = 1;
 			prog_options.do_not_sort = 1;
 			break;
+		case 'h':
+			prog_options.report_in_kb = 0;
+			prog_options.human_readable = 1;
+			break;
 		case 'i':
 			prog_options.print_inode = 1;
+			break;
+		case 'k':
+			prog_options.human_readable = 0;
+			prog_options.report_in_kb = 1;
 			break;
 		case 'r':
 			setReverseSort();

@@ -6,9 +6,11 @@
 typedef struct Options {
 	int show_self_parent;
 	int list_dir_recursive;
+	int human_readable;
 	int plain_dirs;
 	int print_bsize;
 	int print_inode;
+	int report_in_kb;
 	int show_hidden;
 	int show_dir_header;
 	int sort_by_size;
