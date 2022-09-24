@@ -177,6 +177,13 @@ traverseShallow(char **inputs, const Options *ls_options)
 	
 	fts_hier = fts_open(inputs, fts_options, fcomp);
 	while ((fts_ent = fts_read(fts_hier)) != NULL) {
+		if (fts_ent->fts_errno != 0) {
+			printf("%s: %s: %s\n", getprogname(),
+				fts_ent->fts_name, 
+				strerror(fts_ent->fts_errno));	
+			continue;
+		}
+
 		if (showEntry(fts_ent, ls_options)) {
 			printEntry(fts_ent, ls_options);
 		}
