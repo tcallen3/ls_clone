@@ -26,6 +26,8 @@ setDefaultOptions(Options *opts)
 	opts->show_self_parent = 0;
 	opts->list_dir_recursive = 0;
 	opts->plain_dirs = 0;
+	opts->print_bsize = 0;
+	opts->print_inode = 0;
 	opts->do_not_sort = 0;
 	opts->show_hidden = 0;
 	opts->show_dir_header = 0;
