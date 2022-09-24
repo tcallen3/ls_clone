@@ -7,6 +7,11 @@
 
 #include "helpers.h"
 
+/* 
+FIXME: issue with LOGICAL/PHYSICAL traversal where LOGICAL doesn't
+properly report symlinks for long-format analysis. Need to
+reconsider... 
+*/
 void
 usage(const char *synopsis)
 {
@@ -43,7 +48,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacdfhikrSstu";
+	const char *all_opts = "AacdFfhiklnrSstu";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -71,6 +76,9 @@ main(int argc, char *argv[])
 			/* is this hackish? */
 			prog_options.show_dir_header = 1;
 			break;
+		case 'F':
+			prog_options.print_file_type = 1;
+			break;
 		case 'f':
 			/* as in NetBSD, we take -f to imply -a */
 			prog_options.show_hidden = 1;
@@ -86,6 +94,14 @@ main(int argc, char *argv[])
 		case 'k':
 			prog_options.human_readable = 0;
 			prog_options.report_in_kb = 1;
+			break;
+		case 'l':
+			prog_options.print_long_format = 1;
+			prog_options.print_numeric_uid_gid = 0;
+			break;
+		case 'n':
+			prog_options.print_long_format = 1;
+			prog_options.print_numeric_uid_gid = 1;
 			break;
 		case 'r':
 			setReverseSort();

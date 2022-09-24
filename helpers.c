@@ -28,7 +28,10 @@ setDefaultOptions(Options *opts)
 	opts->human_readable = 0;
 	opts->plain_dirs = 0;
 	opts->print_bsize = 0;
+	opts->print_file_type = 0;
 	opts->print_inode = 0;
+	opts->print_long_format = 0;
+	opts->print_numeric_uid_gid = 0;
 	opts->report_in_kb = 0;
 	opts->do_not_sort = 0;
 	opts->show_hidden = 0;

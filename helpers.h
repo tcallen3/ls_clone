@@ -9,7 +9,10 @@ typedef struct Options {
 	int human_readable;
 	int plain_dirs;
 	int print_bsize;
+	int print_file_type;
 	int print_inode;
+	int print_long_format;
+	int print_numeric_uid_gid;
 	int report_in_kb;
 	int show_hidden;
 	int show_dir_header;

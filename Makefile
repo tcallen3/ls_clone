@@ -1,4 +1,4 @@
-CFLAGS = -ansi -g -Wall -Werror -Wextra -Wformat=2 -Wjump-misses-init 
+CFLAGS = -ansi -g3 -Wall -Werror -Wextra -Wformat=2 -Wjump-misses-init 
 CFLAGS += -Wlogical-op -Wpedantic -Wshadow
 
 PROG = my_ls
