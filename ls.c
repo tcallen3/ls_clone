@@ -7,11 +7,6 @@
 
 #include "helpers.h"
 
-/* 
-FIXME: issue with LOGICAL/PHYSICAL traversal where LOGICAL doesn't
-properly report symlinks for long-format analysis. Need to
-reconsider... 
-*/
 void
 usage(const char *synopsis)
 {
