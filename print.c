@@ -1,13 +1,17 @@
+#include <errno.h>
 #include <grp.h>
 #include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "print.h"
 
 #define STRMODE_LEN 12
+#define TMESG_SIZE 512
 
 static void
 printHumanReadable(unsigned long size)
@@ -90,6 +94,39 @@ printUserAndGroup(const struct stat *sb)
 }
 
 static void
+printFileTime(struct stat *sb, const Options *ls_options)
+{
+	time_t ftime;
+	struct tm *tdata;
+	const char format[] = "%b %d %H:%M";
+	char tmsg[TMESG_SIZE];
+
+	if (ls_options->sort_by_mtime) {
+		ftime = sb->st_mtime;
+	} else if (ls_options->sort_by_atime) {
+		ftime = sb->st_atime;
+	} else {
+		ftime = sb->st_ctime;
+	}
+
+	if ((tdata = localtime(&ftime)) == NULL) {
+		if ((tdata = gmtime(&ftime)) == NULL) {
+			fprintf(stderr, "invalid time: %s\n", 
+				strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	if (strftime(tmsg, TMESG_SIZE, format, tdata) == 0) {
+		/* avoid printing time if format errors */
+		printf(" ");
+		return;
+	}
+
+	printf("%s ", tmsg);
+}
+
+static void
 printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 {
 	char fmode[STRMODE_LEN];
@@ -113,7 +150,7 @@ printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 		printf("%5lu ", (unsigned long)sb->st_size);
 	}
 
-	/*printFileTime(sb, ls_options);*/
+	printFileTime(sb, ls_options);
 }
 static void
 printFileName(const FTSENT *fts_ent, const Options *ls_options)
