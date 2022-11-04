@@ -172,7 +172,7 @@ printEntry(FTSENT *fts_ent, const Options *ls_options)
 			perror("symlink traversal");
 		} else {
 			symlink_path[plen] = '\0';
-			printf("-> %s", symlink_path);
+			printf(" -> %s", symlink_path);
 		}
 	}
 

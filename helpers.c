@@ -172,8 +172,8 @@ traverseShallow(char **inputs, const Options *ls_options)
 	FTS *fts_hier = NULL;
 	FTSENT *fts_ent = NULL;
 	CompPointer fcomp = NULL;
-	int fts_options = ls_options->plain_dirs ? 
-				FTS_PHYSICAL : FTS_LOGICAL;
+
+	int fts_options = FTS_PHYSICAL;
 	int fts_term = 0;
 
 	if (ls_options->show_self_parent) {
