@@ -43,7 +43,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacdFfhiklnrSstu";
+	const char *all_opts = "AacdFfhiklnqrSstuw";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -51,6 +51,12 @@ main(int argc, char *argv[])
 	setprogname(argv[0]);
 
 	setDefaultOptions(&prog_options);
+
+	if (isatty(STDOUT_FILENO)) {
+		prog_options.mark_nonprinting = 1;
+	} else {
+		prog_options.mark_nonprinting = 0;
+	}
 
 	while ((ch = getopt(argc, argv, all_opts)) != -1) {
 		switch (ch) {
@@ -98,6 +104,9 @@ main(int argc, char *argv[])
 			prog_options.print_long_format = 1;
 			prog_options.print_numeric_uid_gid = 1;
 			break;
+		case 'q':
+			prog_options.mark_nonprinting = 1;
+			break;
 		case 'r':
 			setReverseSort();
 			break;
@@ -117,6 +126,9 @@ main(int argc, char *argv[])
 			prog_options.sort_by_atime = 1;
 			prog_options.sort_by_mtime = 0;
 			prog_options.sort_by_ctime = 0;
+			break;
+		case 'w':
+			prog_options.mark_nonprinting = 0;
 			break;
 		case '?':
 		default:

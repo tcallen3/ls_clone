@@ -7,6 +7,7 @@ typedef struct Options {
 	int show_self_parent;
 	int list_dir_recursive;
 	int human_readable;
+	int mark_nonprinting;
 	int plain_dirs;
 	int print_bsize;
 	int print_file_type;

@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <errno.h>
 #include <grp.h>
 #include <limits.h>
@@ -147,13 +148,54 @@ printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 
 	printFileTime(sb, ls_options);
 }
+
+char *
+getModifiedName(const char *src_name, const Options *ls_options)
+{
+	size_t nsize, i;
+	char *final_name;
+
+	if (!ls_options->mark_nonprinting) {
+		return NULL;
+	}
+
+	nsize = strlen(src_name) + 1;
+	if ((final_name = malloc(nsize * sizeof(*final_name))) == NULL) {
+		return NULL;
+	}
+
+	if (strlcpy(final_name, src_name, nsize) >= nsize) {
+		(void)free(final_name);
+		return NULL;
+	}
+
+	for (i = 0; i < strlen(final_name); i++) {
+		if (!isprint(final_name[i])) {
+			final_name[i] = '?';
+		}
+	}
+
+	return final_name;
+}
+
 static void
 printFileName(const FTSENT *fts_ent, const Options *ls_options)
 {
 	struct stat *sb = fts_ent->fts_statp;
 	const mode_t exec_comp = S_IXUSR | S_IXGRP | S_IXOTH;
+	char *final_name;
 
-	printf("%s", fts_ent->fts_name);
+	final_name = getModifiedName(fts_ent->fts_name, ls_options);
+
+	if (final_name == NULL) {
+		printf("%s", fts_ent->fts_name);
+	} else {
+		printf("%s", final_name);
+	}
+
+	if (final_name != NULL) {
+		(void)free(final_name);
+	}
 
 	if (fts_ent->fts_info == FTS_D && 
     	    fts_ent->fts_level == 0    &&

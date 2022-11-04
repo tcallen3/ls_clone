@@ -26,6 +26,7 @@ setDefaultOptions(Options *opts)
 	opts->show_self_parent = 0;
 	opts->list_dir_recursive = 0;
 	opts->human_readable = 0;
+	opts->mark_nonprinting = 1;
 	opts->plain_dirs = 0;
 	opts->print_bsize = 0;
 	opts->print_file_type = 0;
