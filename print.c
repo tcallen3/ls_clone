@@ -50,21 +50,15 @@ printHumanReadable(unsigned long size)
  * both cases, since this seems less surprising. 
  */
 static void
-printBlockSize(unsigned long blocks, const Options *ls_options)
+printBlockSize(unsigned long blocks, long user_bsize, 
+		const Options *ls_options)
 {
 	const unsigned long stat_bsize = 512;
-	long user_bsize = 512;
 	unsigned long file_blocks = 0;
 
 	if (ls_options->human_readable) {
 		printHumanReadable(blocks * stat_bsize);
 		return;
-	}
-
-	if (ls_options->report_in_kb) {
-		user_bsize = 1024;
-	} else {
-		(void)getbsize(NULL, &user_bsize);
 	}
 
 	file_blocks = blocks * stat_bsize;
@@ -126,6 +120,7 @@ printFileTime(struct stat *sb, const Options *ls_options)
 	printf("%s ", tmsg);
 }
 
+/* FIXME: need to add blocksize printing before directory */
 static void
 printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 {
@@ -182,7 +177,7 @@ printFileName(const FTSENT *fts_ent, const Options *ls_options)
 }
 
 void 
-printEntry(FTSENT *fts_ent, const Options *ls_options)
+printEntry(FTSENT *fts_ent, long user_bsize, const Options *ls_options)
 {
 	char symlink_path[PATH_MAX];
 	ssize_t plen = 0;
@@ -193,7 +188,7 @@ printEntry(FTSENT *fts_ent, const Options *ls_options)
 
 	if (ls_options->print_bsize) {
 		printBlockSize((unsigned long)fts_ent->fts_statp->st_blocks,
-			       ls_options);
+			       user_bsize, ls_options);
 	}
 
 	if (ls_options->print_long_format) {

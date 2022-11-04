@@ -176,11 +176,19 @@ traverseShallow(char **inputs, const Options *ls_options)
 	int fts_options = FTS_PHYSICAL;
 	int fts_term = 0;
 
+	long user_bsize = 512;
+
 	if (ls_options->show_self_parent) {
 		fts_options |= FTS_SEEDOT;
 	}
 
 	fcomp = chooseSort(ls_options);	
+
+	if (ls_options->report_in_kb) {
+		user_bsize = 1024;
+	} else {
+		(void)getbsize(NULL, &user_bsize);
+	}
 	
 	fts_hier = fts_open(inputs, fts_options, fcomp);
 	while ((fts_ent = fts_read(fts_hier)) != NULL) {
@@ -192,7 +200,7 @@ traverseShallow(char **inputs, const Options *ls_options)
 		}
 
 		if (showEntry(fts_ent, ls_options)) {
-			printEntry(fts_ent, ls_options);
+			printEntry(fts_ent, user_bsize, ls_options);
 		}
 
 		fts_term = (fts_ent->fts_level != 0) || 

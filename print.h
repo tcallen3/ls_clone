@@ -7,6 +7,7 @@
 
 #include "helpers.h"
 
-void printEntry(FTSENT *fts_ent, const Options *ls_options);
+void printEntry(FTSENT *fts_ent, long int user_bsize, 
+		const Options *ls_options);
 
 #endif /* LS_PRINT_H */
