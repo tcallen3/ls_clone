@@ -195,7 +195,7 @@ traverseShallow(char **inputs, const Options *ls_options)
 	while ((fts_ent = fts_read(fts_hier)) != NULL) {
 		if (fts_ent->fts_errno != 0) {
 			printf("%s: %s: %s\n", getprogname(),
-				fts_ent->fts_name, 
+				fts_ent->fts_accpath, 
 				strerror(fts_ent->fts_errno));	
 			continue;
 		}
