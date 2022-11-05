@@ -99,8 +99,8 @@ printFileTime(struct stat *sb, const Options *ls_options)
 	struct tm tdata;
 	struct tm tcurr;
 	struct timespec clock_time;
-	const char format_curr[] = "%b %d %H:%M";
-	const char format_year[] = "%b %d %Y";
+	const char format_curr[] = "%b %e %H:%M";
+	const char format_year[] = "%b %e %Y";
 	char tmsg[TMESG_SIZE];
 
 	/* will fall back to GMT if TZ var is garbage */
@@ -132,6 +132,9 @@ printFileTime(struct stat *sb, const Options *ls_options)
 		exit(EXIT_FAILURE);
 	}
 
+/* Wpedantic + Wformat warning complains about '%e' but this is fine */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
 	if (tdata.tm_year != tcurr.tm_year) {
 		if (strftime(tmsg, TMESG_SIZE, format_year, &tdata) == 0) {
 			/* avoid printing time if format errors */
@@ -145,6 +148,7 @@ printFileTime(struct stat *sb, const Options *ls_options)
 			return;
 		}
 	}
+#pragma GCC diagnostic pop
 
 	printf("%s ", tmsg);
 }
