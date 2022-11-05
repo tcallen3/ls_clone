@@ -43,7 +43,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-	const char *all_opts = "AacdFfhiklnqrSstuw";
+	const char *all_opts = "AacdFfhiklnqRrSstuw";
 	char *local_default[2] = {".", NULL};
 	char **file_targets = NULL;
 	Options prog_options;
@@ -106,6 +106,9 @@ main(int argc, char *argv[])
 			break;
 		case 'q':
 			prog_options.mark_nonprinting = 1;
+			break;
+		case 'R':
+			prog_options.list_dir_recursive = 1;
 			break;
 		case 'r':
 			setReverseSort();
