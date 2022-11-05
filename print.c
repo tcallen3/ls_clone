@@ -71,6 +71,12 @@ printBlockSize(unsigned long blocks, long user_bsize,
 }
 
 static void
+printDevSize(const struct stat *sb)
+{
+	printf("%2d,%2d ", major(sb->st_rdev), minor(sb->st_rdev));
+}
+
+static void
 printUserAndGroup(const struct stat *sb)
 {
 	struct passwd *pass = NULL;
@@ -153,6 +159,12 @@ printFileTime(struct stat *sb, const Options *ls_options)
 	printf("%s ", tmsg);
 }
 
+static int
+isDevice(mode_t fmode)
+{
+	return S_ISBLK(fmode) || S_ISCHR(fmode);
+}
+
 /* TODO: need to add blocksize printing before directory */
 static void
 printLongFormat(FTSENT *fts_ent, const Options *ls_options)
@@ -172,10 +184,14 @@ printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 		printUserAndGroup(sb);
 	}
 
-	if (ls_options->human_readable) {
-		printHumanReadable((unsigned long)sb->st_size);
+	if (isDevice(sb->st_mode)) {
+		printDevSize(sb);
 	} else {
-		printf("%5lu ", (unsigned long)sb->st_size);
+		if (ls_options->human_readable) {
+			printHumanReadable((unsigned long)sb->st_size);
+		} else {
+			printf("%5lu ", (unsigned long)sb->st_size);
+		}
 	}
 
 	printFileTime(sb, ls_options);
@@ -255,14 +271,19 @@ printEntry(FTSENT *fts_ent, long user_bsize, const Options *ls_options)
 {
 	char symlink_path[PATH_MAX];
 	ssize_t plen = 0;
+	unsigned long bsize = 0;
 
 	if (ls_options->print_inode) {
 		printf("%ld ", (long)fts_ent->fts_statp->st_ino);
 	}
 
 	if (ls_options->print_bsize) {
-		printBlockSize((unsigned long)fts_ent->fts_statp->st_blocks,
-			       user_bsize, ls_options);
+		bsize = (unsigned long)fts_ent->fts_statp->st_blocks;
+		if (isDevice(fts_ent->fts_statp->st_mode)) {
+			printDevSize(fts_ent->fts_statp);
+		} else {
+			printBlockSize(bsize, user_bsize, ls_options);
+		}
 	}
 
 	if (ls_options->print_long_format) {
