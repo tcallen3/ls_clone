@@ -50,6 +50,9 @@ printHumanReadable(unsigned long size)
  * as expected. We opt to print blocks human-readable in
  * both cases, since this seems less surprising. 
  */
+
+/* TODO: need to set this so that block and character files print
+	 device numbers rather than blocks */
 static void
 printBlockSize(unsigned long blocks, long user_bsize, 
 		const Options *ls_options)
@@ -92,36 +95,61 @@ static void
 printFileTime(struct stat *sb, const Options *ls_options)
 {
 	time_t ftime;
-	struct tm *tdata;
-	const char format[] = "%b %d %H:%M";
+	time_t ctime;
+	struct tm tdata;
+	struct tm tcurr;
+	struct timespec clock_time;
+	const char format_curr[] = "%b %d %H:%M";
+	const char format_year[] = "%b %d %Y";
 	char tmsg[TMESG_SIZE];
 
-	if (ls_options->sort_by_mtime) {
-		ftime = sb->st_mtime;
+	/* will fall back to GMT if TZ var is garbage */
+	tzset();
+
+	if (ls_options->sort_by_ctime) {
+		ftime = sb->st_ctime;
 	} else if (ls_options->sort_by_atime) {
 		ftime = sb->st_atime;
 	} else {
-		ftime = sb->st_ctime;
+		/* default if nothing is specified */
+		ftime = sb->st_mtime;
 	}
 
-	if ((tdata = localtime(&ftime)) == NULL) {
-		if ((tdata = gmtime(&ftime)) == NULL) {
-			fprintf(stderr, "invalid time: %s\n", 
-				strerror(errno));
-			exit(EXIT_FAILURE);
-		}
+	if (localtime_r(&ftime, &tdata) == NULL) {
+		fprintf(stderr, "invalid time: %s\n", 
+			strerror(errno));
 	}
 
-	if (strftime(tmsg, TMESG_SIZE, format, tdata) == 0) {
-		/* avoid printing time if format errors */
+	if (clock_gettime(CLOCK_REALTIME, &clock_time) != 0) {
 		printf(" ");
 		return;
+	}
+
+	ctime = (time_t)clock_time.tv_sec;	
+	if (localtime_r(&ctime, &tcurr) == NULL) {
+		fprintf(stderr, "invalid time: %s\n",
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	if (tdata.tm_year != tcurr.tm_year) {
+		if (strftime(tmsg, TMESG_SIZE, format_year, &tdata) == 0) {
+			/* avoid printing time if format errors */
+			printf(" ");
+			return;
+		}
+	} else {
+		if (strftime(tmsg, TMESG_SIZE, format_curr, &tdata) == 0) {
+			/* avoid printing time if format errors */
+			printf(" ");
+			return;
+		}
 	}
 
 	printf("%s ", tmsg);
 }
 
-/* FIXME: need to add blocksize printing before directory */
+/* TODO: need to add blocksize printing before directory */
 static void
 printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 {
