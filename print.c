@@ -279,11 +279,7 @@ printEntry(FTSENT *fts_ent, long user_bsize, const Options *ls_options)
 
 	if (ls_options->print_bsize) {
 		bsize = (unsigned long)fts_ent->fts_statp->st_blocks;
-		if (isDevice(fts_ent->fts_statp->st_mode)) {
-			printDevSize(fts_ent->fts_statp);
-		} else {
-			printBlockSize(bsize, user_bsize, ls_options);
-		}
+		printBlockSize(bsize, user_bsize, ls_options);
 	}
 
 	if (ls_options->print_long_format) {
