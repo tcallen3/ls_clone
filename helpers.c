@@ -158,7 +158,8 @@ showEntry(FTSENT *fts_ent, const Options *ls_options)
 	}
 
 	dot_exceptions = ls_options->show_hidden || 
-			 ls_options->show_dir_header;
+			 (ls_options->show_dir_header &&
+				fts_ent->fts_level == 0);
 	if (fts_ent->fts_name[0] == '.' && !dot_exceptions) {
 		return 0;
 	}

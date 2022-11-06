@@ -33,7 +33,7 @@ normalizeDirNames(const int argc, char **argv)
 
 	for (i = 0; i < argc; i++) {
 		len = strlen(argv[i]);
-		if (argv[i][len-1] == '/') {
+		if (len > 1 && (argv[i][len-1] == '/')) {
 			argv[i][len-1] = '\0';
 		}
 	}

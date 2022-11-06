@@ -226,17 +226,28 @@ getModifiedName(const char *src_name, const Options *ls_options)
 	return final_name;
 }
 
+static int
+isDirHeader(const FTSENT *fts_ent, const Options *ls_options)
+{
+	return (fts_ent->fts_info == FTS_D && 
+    	       	fts_ent->fts_level == 0    &&
+    	       	!ls_options->plain_dirs);
+}
+
 static void
 printFileName(const FTSENT *fts_ent, const Options *ls_options)
 {
 	struct stat *sb = fts_ent->fts_statp;
 	const mode_t exec_comp = S_IXUSR | S_IXGRP | S_IXOTH;
+	const char *working_name = isDirHeader(fts_ent, ls_options) ?
+					fts_ent->fts_accpath :
+					fts_ent->fts_name;
 	char *final_name;
 
-	final_name = getModifiedName(fts_ent->fts_name, ls_options);
+	final_name = getModifiedName(working_name, ls_options);
 
 	if (final_name == NULL) {
-		printf("%s", fts_ent->fts_name);
+		printf("%s", working_name);
 	} else {
 		printf("%s", final_name);
 	}
@@ -245,9 +256,7 @@ printFileName(const FTSENT *fts_ent, const Options *ls_options)
 		(void)free(final_name);
 	}
 
-	if (fts_ent->fts_info == FTS_D && 
-    	    fts_ent->fts_level == 0    &&
-    	    !ls_options->plain_dirs) {
+	if (isDirHeader(fts_ent, ls_options)) {
 		printf(":");
 	} else if (ls_options->print_file_type) {
 		if (S_ISDIR(sb->st_mode)) {
