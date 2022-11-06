@@ -96,6 +96,6 @@ do
 	diff -qb ${TSYS} ${TMINE} || echo "BLOCKSIZE=${opt} failed"
 done
 
-# recursive timeout test?
-
-
+# most useful when you have symlink loops to check termination
+echo "Running test: ls -lR /"
+timeout 60 ${MY_LS} -lR / > /dev/null 2>&1 || echo "ls -lR / failed"
