@@ -50,9 +50,6 @@ printHumanReadable(unsigned long size)
  * as expected. We opt to print blocks human-readable in
  * both cases, since this seems less surprising. 
  */
-
-/* TODO: need to set this so that block and character files print
-	 device numbers rather than blocks */
 static void
 printBlockSize(unsigned long blocks, long user_bsize, 
 		const Options *ls_options)
@@ -165,7 +162,6 @@ isDevice(mode_t fmode)
 	return S_ISBLK(fmode) || S_ISCHR(fmode);
 }
 
-/* TODO: need to add blocksize printing before directory */
 static void
 printLongFormat(FTSENT *fts_ent, const Options *ls_options)
 {
