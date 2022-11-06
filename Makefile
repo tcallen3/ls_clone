@@ -1,7 +1,7 @@
 CFLAGS = -ansi -g3 -Wall -Werror -Wextra -Wformat=2 -Wjump-misses-init 
 CFLAGS += -Wlogical-op -Wpedantic -Wshadow
 
-PROG = my_ls
+PROG = ls
 
 SRC = ls.c helpers.c print.c
 BIN = bin
@@ -16,4 +16,4 @@ ${PROG}: ${SRC}
 	${CC} ${CFLAGS} -o ${BIN}/${PROG} ${SRC}
 
 clean:
-	rm -rf ${PROG}
+	rm -rf ${BIN}/${PROG}
